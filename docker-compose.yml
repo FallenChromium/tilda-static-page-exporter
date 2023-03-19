@@ -3,10 +3,11 @@ version: '3'
 services:
   tilda-exporter:
     build: .
+    image: "fallenchromium/tilda-static-pages-exporter"
     environment:
       TILDA_PUBLIC_KEY: ${TILDA_PUBLIC_KEY}
       TILDA_SECRET_KEY: ${TILDA_SECRET_KEY}
-      TILDA_STATIC_PATH_PREFIX: ${TILDA_STATIC_PATH_PREFIX:-/static/}
+      TILDA_STATIC_PATH_PREFIX: /static/
     ports:
       - "${TILDA_BIND_PORT:-5000}:5000"
     volumes:
