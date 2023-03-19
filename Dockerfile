@@ -9,11 +9,7 @@ COPY app.py requirements.txt ./
 
 # Enable BuildKit caches for pip packages
 RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
-    pip install --trusted-host pypi.python.org -r requirements.txt \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends gcc \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Expose port 5000 for the Flask application
 EXPOSE 5000
