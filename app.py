@@ -1,6 +1,10 @@
 import os
 import requests
 from flask import Flask, request
+from dotenv.main import load_dotenv
+from pathlib import Path
+
+load_dotenv()
 
 app = Flask(__name__)
 
