@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, request
+from flask import Flask, request, Response
 from dotenv.main import load_dotenv
 from pathlib import Path
 
@@ -12,7 +12,7 @@ TILDA_PUBLIC_KEY = os.environ.get('TILDA_PUBLIC_KEY')
 TILDA_SECRET_KEY = os.environ.get('TILDA_SECRET_KEY')
 LOCAL_PATH_PREFIX = os.environ.get('TILDA_STATIC_PATH_PREFIX', '')
 
-async def extract_project(project_id):
+def extract_project(project_id):
     # Send the getprojectinfo request and loop through the image array to save common files to the server
     project_info = requests.get(f'https://api.tildacdn.info/v1/getprojectinfo/?projectid={project_id}&publickey={TILDA_PUBLIC_KEY}&secretkey={TILDA_SECRET_KEY}')
     for image in project_info.json()['result']['images']:
@@ -49,7 +49,7 @@ async def extract_project(project_id):
         html_content = page_info.json()['result']['html']
         with open(Path(LOCAL_PATH_PREFIX) / filename, 'w') as f:
             f.write(html_content)
-        app.logger.info(f'Finished extraction for project {project_id}')
+        app.logger.warning(f'Finished extraction for project {project_id}')
 
 
 def save_file(source_url, local_path):
@@ -64,11 +64,16 @@ def save_file(source_url, local_path):
 def handle_webhook():
     # Parse the query parameters from the webhook call
     project_id = request.args.get('projectid')
-    app.logger.info(f'Starting extraction for project {project_id}')
-   
-    # this function has to be non-blocking due to the 5s timeout for Tilda webhook response
-    extract_project(project_id)
-    return 'ok'
+    webhook_public_key = request.args.get('publickey')
+    response = Response('ok')
+    @response.call_on_close
+    def process_after_request():
+        if (webhook_public_key == TILDA_PUBLIC_KEY):
+            # this function has to be non-blocking due to the 5s timeout for Tilda webhook response
+            # so it's called after the response has been sent
+            app.logger.warning(f'Starting extraction for project {project_id} to prefix {LOCAL_PATH_PREFIX}')
+            extract_project(project_id)
+    return response
 
 if __name__ == '__main__':
     import sys
