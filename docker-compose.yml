@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  tilda-exporter:
+    build: .
+    environment:
+      TILDA_PUBLIC_KEY: ${TILDA_PUBLIC_KEY}
+      TILDA_SECRET_KEY: ${TILDA_SECRET_KEY}
+      LOCAL_PATH_PREFIX: ${TILDA_LOCAL_PATH_PREFIX:-/static/}
+    ports:
+      - "${TILDA_BIND_PORT:-5000}:5000"
+    volumes:
+      - ./static/:/static/
