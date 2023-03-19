@@ -5,11 +5,13 @@ FROM python:3.9-slim-buster
 WORKDIR /app
 
 # Copy only the necessary files into the container at /app
-COPY app.py requirements.txt ./
+COPY requirements.txt ./
 
 # Enable BuildKit caches for pip packages
 RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
     pip install --trusted-host pypi.python.org -r requirements.txt
+
+COPY app.py ./
 
 # Expose port 5000 for the Flask application
 EXPOSE 5000
