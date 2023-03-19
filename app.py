@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request
 from dotenv.main import load_dotenv
 from pathlib import Path
+import logging
 
 load_dotenv()
 
@@ -62,14 +63,10 @@ def save_file(source_url, local_path):
 def handle_webhook():
     # Parse the query parameters from the webhook call
     project_id = request.args.get('projectid')
-
-    # Log that a project extraction has been started
     logging.info(f'Starting extraction for project {project_id}')
 
-    # Extract the project and its pages
     extract_project(project_id)
-
-    # Log that the project extraction has finished
+    
     logging.info(f'Finished extraction for project {project_id}')
 
     return 'OK'
