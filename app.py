@@ -58,16 +58,21 @@ def save_file(source_url, local_path):
             if chunk:
                 f.write(chunk)
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook', methods=['GET'])
 def handle_webhook():
-    # Parse the JSON payload from the webhook call
-    payload = request.json
+    # Parse the query parameters from the webhook call
+    project_id = request.args.get('projectid')
 
-    # Extract the project specified in the payload
-    project_id = payload['projectid']
+    # Log that a project extraction has been started
+    logging.info(f'Starting extraction for project {project_id}')
+
+    # Extract the project and its pages
     extract_project(project_id)
 
-    return 'OK', 200
+    # Log that the project extraction has finished
+    logging.info(f'Finished extraction for project {project_id}')
+
+    return 'OK'
 
 if __name__ == '__main__':
     import sys
