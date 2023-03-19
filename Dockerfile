@@ -22,4 +22,5 @@ ENV TILDA_SECRET_KEY=<your-tilda-secret-key>
 ENV LOCAL_PATH_PREFIX=<your-local-path-prefix>
 
 # Start the Gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app:app"]
+# Timeout argument is required due to the post-response 
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--timeout=90"]
