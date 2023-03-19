@@ -3,7 +3,6 @@ import requests
 from flask import Flask, request
 from dotenv.main import load_dotenv
 from pathlib import Path
-import logging
 
 load_dotenv()
 
@@ -13,7 +12,7 @@ TILDA_PUBLIC_KEY = os.environ.get('TILDA_PUBLIC_KEY')
 TILDA_SECRET_KEY = os.environ.get('TILDA_SECRET_KEY')
 LOCAL_PATH_PREFIX = os.environ.get('TILDA_STATIC_PATH_PREFIX', '')
 
-def extract_project(project_id):
+async def extract_project(project_id):
     # Send the getprojectinfo request and loop through the image array to save common files to the server
     project_info = requests.get(f'https://api.tildacdn.info/v1/getprojectinfo/?projectid={project_id}&publickey={TILDA_PUBLIC_KEY}&secretkey={TILDA_SECRET_KEY}')
     for image in project_info.json()['result']['images']:
@@ -50,6 +49,8 @@ def extract_project(project_id):
         html_content = page_info.json()['result']['html']
         with open(Path(LOCAL_PATH_PREFIX) / filename, 'w') as f:
             f.write(html_content)
+        app.logger.info(f'Finished extraction for project {project_id}')
+
 
 def save_file(source_url, local_path):
     # Download the file from the source URL and save it to the local path
@@ -63,13 +64,11 @@ def save_file(source_url, local_path):
 def handle_webhook():
     # Parse the query parameters from the webhook call
     project_id = request.args.get('projectid')
-    logging.info(f'Starting extraction for project {project_id}')
-
+    app.logger.info(f'Starting extraction for project {project_id}')
+   
+    # this function has to be non-blocking due to the 5s timeout for Tilda webhook response
     extract_project(project_id)
-    
-    logging.info(f'Finished extraction for project {project_id}')
-
-    return 'OK'
+    return 'ok'
 
 if __name__ == '__main__':
     import sys
