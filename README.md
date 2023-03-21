@@ -1,6 +1,6 @@
 # Tilda Static Pages Exporter
 
-This Python script exports static pages from a [Tilda.cc](https://tilda.cc) project and saves them locally to your server. You can use this script to host your website on your own server and synchronize the contents of your website with Tilda page builder.
+This Python script exports static pages from a [Tilda.cc](https://tilda.cc) project using Tilda API and saves them locally to your server. It also listens to a webhook, so that your pages always remain up-to-date. You can use this script to host your website on your own server and synchronize it with the Tilda page builder.
 
 **Note**: Exporting static pages from Tilda using the API requires a Tilda Business account.
 
